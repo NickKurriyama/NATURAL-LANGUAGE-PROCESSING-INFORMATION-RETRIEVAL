@@ -3,9 +3,7 @@
 
 ## 1. Introduction
 
-Dự án này xây dựng một hệ thống **Natural Language Processing
-Information Retrieval (NLP‑IR)** nhằm tìm kiếm và tổng hợp thông tin từ
-tập lớn các bài báo khoa học liên quan đến xử lý ngôn ngữ tự nhiên.
+Dự án này xây dựng một hệ thống **Natural Language Processing Information Retrieval (NLP‑IR)** nhằm tìm kiếm và tổng hợp thông tin từ tập lớn các bài báo khoa học liên quan đến xử lý ngôn ngữ tự nhiên.
 
 Hệ thống cho phép người dùng nhập:
 
@@ -39,43 +37,35 @@ Prompt: summarize methods
 
 Ví dụ:
 
-Answer: Tóm tắt các phương pháp sử dụng mô hình Transformer trong dịch
-máy.
+Answer: Tóm tắt các phương pháp sử dụng mô hình Transformer trong dịch máy.
 
-Relevant papers: 1. Attention Is All You Need 2. BERT: Pre‑training of
-Deep Bidirectional Transformers 3. T5: Exploring the Limits of Transfer
-Learning
+Relevant papers: 
+1. Attention Is All You Need 
+2. BERT: Pre‑training of Deep Bidirectional Transformers
+3. T5: Exploring the Limits of Transfer Learning
 
 ------------------------------------------------------------------------
 
-## 3. Pipeline hệ thống
-
-Data Collection\
-→ Preprocessing\
-→ Indexing\
-→ Query Processing\
-→ Search & Ranking\
-→ Answer Generation\
-→ Evaluation
-
+## 3. Pipeline
+Data Collection -> Preprocessing -> Indexing -> Query Processing -> Search & Ranking -> Answer Generation -> Evaluation
 ------------------------------------------------------------------------
 
 ## 4. Thu thập dữ liệu
 
 Nguồn dữ liệu chính:
 
--   arXiv API
+-   ArXiv API
 -   PDF papers
 -   Metadata của bài báo
 
 Thông tin lưu trữ:
 
--   title
--   authors
--   abstract
--   year
--   category
--   pdf
+-   Title
+-   Authors
+-   Abstract
+-   Year
+-   Category
+-   Pdf
 
 ------------------------------------------------------------------------
 
@@ -83,10 +73,10 @@ Thông tin lưu trữ:
 
 Bài báo khoa học thường có các đặc điểm:
 
--   bố cục nhiều cột
--   công thức toán học
--   bảng biểu và hình ảnh
--   danh sách tài liệu tham khảo
+-   Bố cục nhiều cột
+-   Công thức toán học
+-   Bảng biểu và hình ảnh
+-   Danh sách tài liệu tham khảo
 
 ### 5.1 Trích xuất text từ PDF
 
@@ -101,8 +91,8 @@ Các thư viện có thể sử dụng:
 
 Các phần quan trọng:
 
--   Abstract
--   Introduction
+-   Abstract (key)
+-   Introduction (key)
 -   Related Work
 -   Methodology
 -   Experiments
@@ -124,7 +114,7 @@ Các bước NLP:
 
 Hệ thống sử dụng **Inverted Index** để tìm kiếm nhanh.
 
-Ví dụ:
+Example:
 
 transformer → \[paper1, paper5, paper8\]\
 attention → \[paper2, paper4, paper5\]\
@@ -133,8 +123,6 @@ bert → \[paper3, paper7\]
 ------------------------------------------------------------------------
 
 ## 7. Xử lý truy vấn (Query Processing)
-
-Các bước:
 
 1.  Tokenization
 2.  Loại bỏ stopwords
@@ -145,9 +133,7 @@ Ví dụ:
 
 Query: "mô hình transformer cho dịch máy"
 
-→ dịch sang:
-
-"transformer model for machine translation"
+Translate: "transformer model for machine translation"
 
 ------------------------------------------------------------------------
 
@@ -173,10 +159,10 @@ Danh sách Top‑K được xếp hạng lại theo độ liên quan.
 
 Hệ thống tổng hợp nội dung từ các bài báo:
 
--   tóm tắt nội dung
--   so sánh phương pháp
--   liệt kê các kỹ thuật
--   trả lời câu hỏi theo prompt
+-   Tóm tắt nội dung
+-   So sánh phương pháp
+-   Liệt kê các kỹ thuật
+-   Trả lời câu hỏi theo prompt
 
 Ví dụ:
 
@@ -201,13 +187,22 @@ Những chỉ số này đánh giá mức độ chính xác của hệ thống t
 
 ## 11. Cấu trúc project
 
-project/
+*project/
 
-data/ - raw_papers - processed_papers
+1. data/
+   - raw_papers
+   - processed_papers
 
-src/ - data_collection.py - pdf_extraction.py - preprocessing.py -
-indexing.py - retrieval.py - query_processing.py - ranking.py -
-answer_generation.py - evaluation.py
+2. src/
+   - data_collection.py
+   - pdf_extraction.py
+   - preprocessing.py
+   - indexing.py
+   - retrieval.py
+   - query_processing.py
+   - ranking.py
+   - answer_generation.py
+   - evaluation.py
 
 app/ - main.py
 
@@ -215,11 +210,6 @@ requirements.txt\
 README.md
 
 ------------------------------------------------------------------------
-## Giới thiệu
-Dự án xây dựng hệ thống tìm kiếm và tổng hợp thông tin từ các bài báo khoa học sử dụng NLP và Information Retrieval.
-
-## Pipeline
-Data Collection → Preprocessing → Indexing → Query Processing → Search & Ranking → Answer Generation → Evaluation
 
 ## Scheduling
 
