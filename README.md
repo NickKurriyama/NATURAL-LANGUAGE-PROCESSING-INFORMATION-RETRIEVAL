@@ -1,228 +1,388 @@
+# Hệ Thống Truy Xuất Thông Tin Tài Liệu Khoa Học (NLP Information Retrieval)
 
-# Hệ Thống Truy Xuất Thông Tin Tài Liệu Khoa Học (NLP-IR)
+## 1. Giới thiệu
 
-## 1. Introduction
+Dự án này xây dựng một hệ thống **Information Retrieval (IR)** nhằm tìm
+kiếm các bài báo khoa học trong lĩnh vực **Natural Language Processing
+(NLP)**.
 
-Dự án này xây dựng một hệ thống **Natural Language Processing Information Retrieval (NLP‑IR)** nhằm tìm kiếm và tổng hợp thông tin từ tập lớn các bài báo khoa học liên quan đến xử lý ngôn ngữ tự nhiên.
+Mục tiêu của hệ thống:
 
-Hệ thống cho phép người dùng nhập:
+- Thu thập và xử lý dữ liệu bài báo khoa học
+- Xây dựng nhiều phương pháp truy xuất thông tin khác nhau
+- So sánh hiệu năng giữa các phương pháp
+- Đánh giá hệ thống bằng các **IR metrics** chuẩn
 
--   **Query**: chủ đề cần tìm kiếm\
--   **Prompt**: yêu cầu cách trả lời (tóm tắt, so sánh, liệt kê phương pháp)
+Ba nhóm phương pháp chính:
 
-Và sinh ra các kết quả:
+1.  Keyword-based Retrieval
+2.  Embedding-based Retrieval
+3.  Hybrid Retrieval
 
-1.  Tìm các bài báo liên quan
-2.  Xếp hạng theo mức độ liên quan
-3.  Sinh câu trả lời tổng hợp bằng ngôn ngữ tự nhiên
+Mỗi nhóm bao gồm **hai phương pháp con** để so sánh hiệu quả.
 
-------------------------------------------------------------------------
+---
 
-## 2. Input / Output
+# 2. Input / Output
 
-### Input
+## Input
 
--   Query: nội dung người dùng muốn tìm
--   Prompt: yêu cầu định dạng câu trả lời
-
-Ví dụ:
-
-Query: transformer for machine translation\
-Prompt: summarize methods
-
-### Output
-
--   Câu trả lời tổng hợp
--   Danh sách các bài báo liên quan
+Người dùng nhập một **query tìm kiếm**.
 
 Ví dụ:
 
-Answer: Tóm tắt các phương pháp sử dụng mô hình Transformer trong dịch máy.
+    transformer machine translation
 
-Relevant papers: 
-1. Attention Is All You Need 
-2. BERT: Pre‑training of Deep Bidirectional Transformers
-3. T5: Exploring the Limits of Transfer Learning
+## Output
 
-------------------------------------------------------------------------
+Hệ thống trả về **Top-K bài báo liên quan nhất**.
 
-## 3. Pipeline
-Data Collection -> Preprocessing -> Indexing -> Query Processing -> Search & Ranking -> Answer Generation -> Evaluation
-------------------------------------------------------------------------
+Ví dụ:
 
-## 4. Thu thập dữ liệu
+    Top 5 Results
 
-Nguồn dữ liệu chính:
+    1. Attention Is All You Need
+    2. Transformer for Neural Machine Translation
+    3. BERT: Pre-training of Deep Bidirectional Transformers
+    4. T5: Exploring the Limits of Transfer Learning
+    5. Scaling Transformers
 
--   ArXiv API
--   PDF papers
--   Metadata của bài báo
+Mỗi kết quả bao gồm:
+
+- Title
+- Authors
+- Abstract
+- Year
+- Relevance score
+
+---
+
+# 3. Pipeline hệ thống
+
+Pipeline tổng thể:
+
+    Thu thập dữ liệu
+          ↓
+    Tiền xử lý dữ liệu
+          ↓
+    Xây dựng Index
+          ↓
+    Xử lý Query
+          ↓
+    Retrieval
+          ↓
+    Ranking
+          ↓
+    Top-K Results
+          ↓
+    Evaluation
+
+Tùy chọn (demo):
+
+    Top-K Results → LLM Summary → UI Demo
+
+---
+
+# 4. Dataset
+
+Nguồn dữ liệu:
+
+- arXiv API
+- Các bài báo thuộc lĩnh vực NLP
 
 Thông tin lưu trữ:
 
--   Title
--   Authors
--   Abstract
--   Year
--   Category
--   Pdf
+- id
+- title
+- abstract
+- authors
+- year
+- category
+- pdf_url
 
-------------------------------------------------------------------------
+Cấu trúc dữ liệu:
 
-## 5. Tiền xử lý dữ liệu
+    data/
+        raw/
+        processed/
 
-Bài báo khoa học thường có các đặc điểm:
+---
 
--   Bố cục nhiều cột
--   Công thức toán học
--   Bảng biểu và hình ảnh
--   Danh sách tài liệu tham khảo
+# 5. Tiền xử lý dữ liệu
 
-### 5.1 Trích xuất text từ PDF
+Các bước tiền xử lý văn bản:
 
-Các thư viện có thể sử dụng:
+### Text Cleaning
 
--   PyMuPDF
--   pdfplumber
--   GROBID
--   Nougat
+- chuyển về lowercase
+- loại bỏ dấu câu
+- loại bỏ ký tự đặc biệt
 
-### 5.2 Trích xuất cấu trúc bài báo
+### Tokenization
 
-Các phần quan trọng:
+Tách văn bản thành các token.
 
--   Abstract (key)
--   Introduction (key)
--   Related Work
--   Methodology
--   Experiments
--   Conclusion
--   References
+### Stopword Removal
 
-### 5.3 Xử lý văn bản
+Loại bỏ các từ phổ biến:
 
-Các bước NLP:
+    the, is, are, for, and...
 
--   Tokenization
--   Stopword Removal
--   Lemmatization / Stemming
--   Text Normalization
+### Lemmatization / Stemming
 
-------------------------------------------------------------------------
-
-## 6. Lập chỉ mục (Indexing)
-
-Hệ thống sử dụng **Inverted Index** để tìm kiếm nhanh.
-
-Example:
-
-transformer → \[paper1, paper5, paper8\]\
-attention → \[paper2, paper4, paper5\]\
-bert → \[paper3, paper7\]
-
-------------------------------------------------------------------------
-
-## 7. Xử lý truy vấn (Query Processing)
-
-1.  Tokenization
-2.  Loại bỏ stopwords
-3.  Mở rộng từ đồng nghĩa
-4.  Dịch query nếu nhập bằng tiếng Việt
+Chuẩn hóa từ về dạng gốc.
 
 Ví dụ:
 
-Query: "mô hình transformer cho dịch máy"
+    transformers → transformer
+    models → model
 
-Translate: "transformer model for machine translation"
+---
 
-------------------------------------------------------------------------
+# 6. Xây dựng Ground Truth
 
-## 8. Search và Ranking
+Ground truth dùng để đánh giá hệ thống.
 
-### Retrieval
+Dạng dữ liệu:
 
-Các phương pháp:
-
--   BM25
--   Boolean Search
--   Cosine Similarity
-
-Hệ thống trả về **Top‑K papers** có liên quan nhất.
-
-### Ranking
-
-Danh sách Top‑K được xếp hạng lại theo độ liên quan.
-
-------------------------------------------------------------------------
-
-## 9. Sinh câu trả lời (Answer Generation)
-
-Hệ thống tổng hợp nội dung từ các bài báo:
-
--   Tóm tắt nội dung
--   So sánh phương pháp
--   Liệt kê các kỹ thuật
--   Trả lời câu hỏi theo prompt
+    Query → Relevant Papers
 
 Ví dụ:
 
-Prompt: compare methods
+    Query:
+    machine translation transformer
 
-Output: So sánh giữa Transformer, BERT và T5.
+    Relevant papers:
+    - Attention Is All You Need
+    - Transformer for Neural Machine Translation
 
-------------------------------------------------------------------------
+## Query Set
 
-## 10. Đánh giá hệ thống
+Chuẩn bị khoảng **20--50 queries**.
+
+Ví dụ:
+
+    machine translation
+    question answering
+    text summarization
+    information retrieval
+    named entity recognition
+
+## Synonym Queries
+
+Một số query có từ đồng nghĩa:
+
+    NLP ↔ natural language processing
+    MT ↔ machine translation
+    IR ↔ information retrieval
+
+---
+
+# 7. Các phương pháp Retrieval
+
+## 7.1 Keyword-Based Retrieval
+
+### Method 1: TF-IDF + Cosine Similarity
+
+Biểu diễn văn bản bằng vector TF-IDF.
+
+Độ tương đồng:
+
+    cosine(query, document)
+
+### Method 2: BM25
+
+Thuật toán ranking phổ biến trong search engine.
+
+Ưu điểm:
+
+- xử lý tốt độ dài văn bản
+- ranking chính xác hơn TF-IDF
+
+---
+
+## 7.2 Embedding-Based Retrieval
+
+### Method 1: Sentence Embedding
+
+Sử dụng mô hình Sentence-BERT để chuyển văn bản thành vector.
+
+Sau đó tính **cosine similarity** giữa query và document.
+
+### Method 2: Vector Search với FAISS
+
+Sử dụng thư viện FAISS để xây dựng **vector index**.
+
+Có thể sử dụng các thuật toán ANN:
+
+- HNSW
+- Product Quantization
+
+---
+
+## 7.3 Hybrid Retrieval
+
+Kết hợp keyword search và semantic search.
+
+### Method 1: Score Fusion
+
+Kết hợp điểm số:
+
+    final_score = α * BM25 + β * Embedding
+
+### Method 2: Rank Fusion
+
+Kết hợp thứ hạng của hai hệ thống.
+
+Ví dụ:
+
+    Reciprocal Rank Fusion (RRF)
+
+---
+
+# 8. Evaluation
 
 Các chỉ số đánh giá:
 
--   Precision
--   Recall
--   F1 Score
--   MAP (Mean Average Precision)
+### Precision@K
 
-Những chỉ số này đánh giá mức độ chính xác của hệ thống tìm kiếm.
+    Precision@5 = relevant_in_top5 / 5
 
-------------------------------------------------------------------------
+### Recall@K
 
-## 11. Cấu trúc project
+    Recall@5 = relevant_in_top5 / total_relevant_documents
 
-*project/
+### F1 Score
 
-1. data/
-   - raw_papers
-   - processed_papers
+Trung bình điều hòa giữa Precision và Recall.
 
-2. src/
-   - data_collection.py
-   - pdf_extraction.py
-   - preprocessing.py
-   - indexing.py
-   - retrieval.py
-   - query_processing.py
-   - ranking.py
-   - answer_generation.py
-   - evaluation.py
+### MAP (Mean Average Precision)
 
-app/ - main.py
+Đánh giá chất lượng ranking trên nhiều queries.
 
-requirements.txt\
-README.md
+---
 
-------------------------------------------------------------------------
+# 9. Optional: LLM Integration
 
-## Scheduling
+Sau khi retrieval, có thể sử dụng LLM để:
 
-### Member 1 – Data Pipeline
-- data_collection.py
-- pdf_extraction.py
+- tóm tắt nội dung bài báo
+- so sánh các phương pháp
+- tạo câu trả lời tự nhiên
+
+LLM chỉ dùng **cho mục đích demo** và **không ảnh hưởng tới
+evaluation**.
+
+---
+
+# 10. Cấu trúc Project
+
+```
+project/
+
+    data/
+        raw/                 # dữ liệu thu thập từ arXiv
+        processed/           # dữ liệu sau preprocessing
+        ground_truth/        # query + relevant documents
+
+    notebooks/
+        eda.ipynb
+        keyword_retrieval.ipynb
+        embedding_retrieval.ipynb
+        hybrid_retrieval.ipynb
+
+    src/
+
+        data_pipeline/
+            preprocessing.py
+            dataset_loader.py
+
+        keyword_retrieval/           # Nick
+            build_inverted_index.py
+            tfidf_retrieval.py
+            bm25_retrieval.py
+            keyword_pipeline.py
+
+        embedding_retrieval/         # Khoa
+            build_embedding_index.py
+            sentence_embedding.py
+            faiss_index.py
+            embedding_pipeline.py
+
+        hybrid_retrieval/            # Khoa
+            score_fusion.py
+            rank_fusion.py
+            hybrid_pipeline.py
+
+        evaluation/                  # Nick
+            metrics.py
+            evaluate_keyword.py
+            evaluate_embedding.py
+            evaluate_hybrid.py
+
+    app/
+        search_demo.py
+        ui_demo.py
+
+    experiments/
+        run_keyword.py
+        run_embedding.py
+        run_hybrid.py
+
+    README.md
+    requirements.txt
+```
+
+---
+
+# 11. Phân công công việc
+
+## Nick Võ -- Data & Keyword Retrieval
+
+Phụ trách:
+
+### Data Pipeline
+
 - preprocessing.py
-- indexing.py
-- retrieval.py
+- dataset_loader.py
 
-### Member 2 – Query & Answer System
-- query_processing.py
-- ranking.py
-- answer_generation.py
-- evaluation.py
-- main.py
+### Retrieval Methods
+
+- TF-IDF retrieval
+- BM25 retrieval
+
+### Evaluation
+
+- Precision@K
+- Recall@K
+- MAP
+
+---
+
+## Anh Khoa -- Embedding & Hybrid Retrieval
+
+Phụ trách:
+
+### Ground Truth
+
+- tạo tập query
+- gán relevant documents
+
+### Vector Retrieval
+
+- Sentence-BERT embeddings
+- FAISS vector index
+
+### Hybrid Retrieval
+
+- score fusion
+- rank fusion
+
+---
+
+## Cả hai cùng thực hiện
+
+- phân tích kết quả
+- viết report
+- xây dựng demo UI
+- tích hợp LLM (optional)

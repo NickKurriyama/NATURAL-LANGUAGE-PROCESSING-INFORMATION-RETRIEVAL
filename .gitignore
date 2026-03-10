@@ -10,6 +10,7 @@ datasets/
 models/
 checkpoints/
 results/
+logs/
 
 # Notebook
 .ipynb_checkpoints/
@@ -21,3 +22,6 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+# Running
+*.slurm
