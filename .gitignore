@@ -22,3 +22,6 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+# Running
+*.slurm
