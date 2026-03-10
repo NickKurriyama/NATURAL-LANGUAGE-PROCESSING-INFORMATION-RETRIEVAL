@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+
+# Dataset
+data/
+datasets/
+
+# Model / output
+models/
+checkpoints/
+results/
+
+# Notebook
+.ipynb_checkpoints/
+
+# Environment
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
