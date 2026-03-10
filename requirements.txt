@@ -7,3 +7,9 @@ pymupdf
 pdfplumber
 seaborn
 matplotlib
+tqdm 
+pyarrow==15.0.2
+feedparser
+faiss-gpu 
+sentence-transformers 
+torch
